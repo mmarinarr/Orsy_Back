@@ -27,24 +27,18 @@ public class ComandaController {
         this.productoRepo = productoRepo;
     }
 
-    // =========================
-    // CREAR COMANDA (CORREGIDO)
-    // =========================
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Comanda> crear(@RequestBody ComandaDTO dto) {
 
-        // 1. Buscar mesa
         Mesa mesa = mesaRepo.findById(dto.mesaId())
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
 
-        // 2. Crear comanda
         Comanda comanda = new Comanda();
         comanda.setMesa(mesa);
         comanda.setEstado(dto.estado() != null ? dto.estado() : EstadoComanda.ABIERTA);
         comanda.setFecha(LocalDateTime.now());
 
-        // 3. Crear líneas
         List<LineaComanda> lineas = new ArrayList<>();
 
         for (LineaDTO l : dto.lineas()) {
@@ -58,20 +52,16 @@ public class ComandaController {
             linea.setPrecio(producto.getPrecio());
             linea.setCategoria(producto.getCategoria() != null ? producto.getCategoria().getNombre() : null);
             linea.setCantidad(l.cantidad());
-            linea.setComanda(comanda); // 🔥 CLAVE (evita el 500)
+            linea.setComanda(comanda);
 
             lineas.add(linea);
         }
 
         comanda.setLineas(lineas);
 
-        // 4. Guardar todo en cascada
         return ResponseEntity.ok(comandaRepo.save(comanda));
     }
 
-    // =========================
-    // COMANDA ACTIVA POR MESA
-    // =========================
     @GetMapping("/mesa/{mesaId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Comanda> getActiva(@PathVariable Long mesaId) {
@@ -81,18 +71,12 @@ public class ComandaController {
                 .orElse(ResponseEntity.ok(null));
     }
 
-    // =========================
-    // TODAS LAS COMANDAS
-    // =========================
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public List<Comanda> getAll() {
         return comandaRepo.findAll();
     }
 
-    // =========================
-    // ACTUALIZAR COMANDA
-    // =========================
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Comanda> actualizar(@PathVariable Long id,
@@ -108,9 +92,6 @@ public class ComandaController {
         return ResponseEntity.ok(comandaRepo.save(comanda));
     }
 
-    // =========================
-    // BORRAR
-    // =========================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void borrar(@PathVariable Long id) {

@@ -20,18 +20,12 @@ public class MesaController {
         this.repo = repo;
     }
 
-    // ======================
-    // GET ALL
-    // ======================
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public List<Mesa> getAll() {
         return repo.findAll();
     }
 
-    // ======================
-    // GET BY ID  ✅ (ESTO TE FALTABA)
-    // ======================
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Mesa> getById(@PathVariable Long id) {
@@ -40,18 +34,12 @@ public class MesaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ======================
-    // CREATE
-    // ======================
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Mesa crear(@RequestBody Mesa m) {
         return repo.save(m);
     }
 
-    // ======================
-    // UPDATE COMPLETO
-    // ======================
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Mesa> actualizar(@PathVariable Long id, @RequestBody Mesa m) {
@@ -69,9 +57,6 @@ public class MesaController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ======================
-    // CAMBIAR ESTADO
-    // ======================
     @PutMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Mesa> cambiarEstado(@PathVariable Long id, @RequestBody MesaEstadoDTO dto) {
@@ -85,9 +70,6 @@ public class MesaController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ======================
-    // DELETE
-    // ======================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> borrar(@PathVariable Long id) {

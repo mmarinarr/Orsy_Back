@@ -17,7 +17,6 @@ public class Categoria {
     @JsonIgnore
     private List<Producto> productos;
 
-    // CONSTRUCTORES
     public Categoria() {}
 
     public Categoria(String nombre) {
