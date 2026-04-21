@@ -11,11 +11,14 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nombre;
+
     private double precio;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
+    @JsonIgnoreProperties("productos")
     private Categoria categoria;
 
     // CONSTRUCTORES
@@ -30,10 +33,6 @@ public class Producto {
     // GETTERS Y SETTERS
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNombre() {

@@ -11,38 +11,61 @@ public class Comanda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String estado; // ABIERTA, CERRADA, PAGADA
+    @Enumerated(EnumType.STRING)
+    private EstadoComanda estado;
 
+    @Column(nullable = false)
     private LocalDateTime fecha;
 
     @ManyToOne
-    @JoinColumn(name = "mesa_id")
     private Mesa mesa;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "comanda_producto",
-            joinColumns = @JoinColumn(name = "comanda_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
-    private List<Producto> productos;
+    @OneToMany(mappedBy = "comanda", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LineaComanda> lineas;
 
-    // CONSTRUCTORES
     public Comanda() {
         this.fecha = LocalDateTime.now();
     }
 
-    // GETTERS Y SETTERS
-    public Long getId() { return id; }
+    // getters y setters
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public List<LineaComanda> getLineas() {
+        return lineas;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
+    public void setLineas(List<LineaComanda> lineas) {
+        this.lineas = lineas;
+    }
 
-    public Mesa getMesa() { return mesa; }
-    public void setMesa(Mesa mesa) { this.mesa = mesa; }
+    public Mesa getMesa() {
+        return mesa;
+    }
 
-    public List<Producto> getProductos() { return productos; }
-    public void setProductos(List<Producto> productos) { this.productos = productos; }
+    public void setMesa(Mesa mesa) {
+        this.mesa = mesa;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public EstadoComanda getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoComanda estado) {
+        this.estado = estado;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

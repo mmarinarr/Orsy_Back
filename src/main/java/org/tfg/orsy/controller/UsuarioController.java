@@ -1,8 +1,8 @@
 package org.tfg.orsy.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.tfg.orsy.model.Usuario;
-import org.tfg.orsy.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.tfg.orsy.service.UsuarioService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,36 +12,33 @@ import java.util.List;
 @CrossOrigin
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioRepository repo;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Usuario> getAll() {
-        return repo.findAll();
+        return usuarioService.listar();
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Usuario crear(@RequestBody Usuario u) {
-        return repo.save(u);
+        return usuarioService.crear(u);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Usuario actualizar(@PathVariable Long id, @RequestBody Usuario u) {
-        Usuario existente = repo.findById(id).orElse(null);
-
-        if (existente != null) {
-            existente.setNombre(u.getNombre());
-            existente.setEmail(u.getEmail());
-            existente.setPassword(u.getPassword());
-            existente.setRol(u.getRol());
-            return repo.save(existente);
-        }
-
-        return null;
+        return usuarioService.actualizar(id, u);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void borrar(@PathVariable Long id) {
-        repo.deleteById(id);
+        usuarioService.borrar(id);
     }
 }

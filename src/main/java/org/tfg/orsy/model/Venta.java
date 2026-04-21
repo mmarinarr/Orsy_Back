@@ -17,18 +17,37 @@ public class Venta {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "venta_id")
-    private List<LineaVenta> lineas;
+    private List<LineaComanda> lineas;
 
-    // Getters y setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public double getTotal() { return total; }
-    public void setTotal(double total) { this.total = total; }
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
-    public List<LineaVenta> getLineas() { return lineas; }
-    public void setLineas(List<LineaVenta> lineas) { this.lineas = lineas; }
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public List<LineaComanda> getLineas() {
+        return lineas;
+    }
+
+    public void setLineas(List<LineaComanda> lineas) {
+        this.lineas = lineas;
+    }
 }

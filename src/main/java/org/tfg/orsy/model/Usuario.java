@@ -1,5 +1,6 @@
 package org.tfg.orsy.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,14 +11,19 @@ public class Usuario {
     private Long id;
 
     private String nombre;
+    @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    private String rol; // ADMIN o EMPLEADO
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RolUsuario rol;
 
     // constructores
     public Usuario() {}
 
-    public Usuario(String nombre, String email, String password, String rol) {
+    public Usuario(String nombre, String email, String password, RolUsuario rol) {
         this.nombre = nombre;
         this.email = email;
         this.password = password;
@@ -37,6 +43,6 @@ public class Usuario {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+    public RolUsuario getRol() { return rol; }
+    public void setRol(RolUsuario rol) { this.rol = rol; }
 }

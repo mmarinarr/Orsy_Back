@@ -1,8 +1,10 @@
 package org.tfg.orsy.controller;
 
 import org.tfg.orsy.model.Mesa;
+import org.tfg.orsy.model.MesaEstadoDTO;
 import org.tfg.orsy.repository.MesaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,37 +14,89 @@ import java.util.List;
 @CrossOrigin
 public class MesaController {
 
-    @Autowired
-    private MesaRepository repo;
+    private final MesaRepository repo;
 
+    public MesaController(MesaRepository repo) {
+        this.repo = repo;
+    }
+
+    // ======================
+    // GET ALL
+    // ======================
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public List<Mesa> getAll() {
         return repo.findAll();
     }
 
+    // ======================
+    // GET BY ID  ✅ (ESTO TE FALTABA)
+    // ======================
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Mesa> getById(@PathVariable Long id) {
+        return repo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ======================
+    // CREATE
+    // ======================
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Mesa crear(@RequestBody Mesa m) {
         return repo.save(m);
     }
 
+    // ======================
+    // UPDATE COMPLETO
+    // ======================
     @PutMapping("/{id}")
-    public Mesa actualizar(@PathVariable Long id, @RequestBody Mesa m) {
-        Mesa existente = repo.findById(id).orElse(null);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Mesa> actualizar(@PathVariable Long id, @RequestBody Mesa m) {
 
-        if (existente != null) {
+        return repo.findById(id).map(existente -> {
+
             existente.setNumero(m.getNumero());
             existente.setCapacidad(m.getCapacidad());
             existente.setX(m.getX());
             existente.setY(m.getY());
             existente.setEstado(m.getEstado());
-            return repo.save(existente);
-        }
 
-        return null;
+            return ResponseEntity.ok(repo.save(existente));
+
+        }).orElse(ResponseEntity.notFound().build());
     }
 
+    // ======================
+    // CAMBIAR ESTADO
+    // ======================
+    @PutMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Mesa> cambiarEstado(@PathVariable Long id, @RequestBody MesaEstadoDTO dto) {
+
+        return repo.findById(id).map(mesa -> {
+
+            mesa.setEstado(dto.estado());
+
+            return ResponseEntity.ok(repo.save(mesa));
+
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // ======================
+    // DELETE
+    // ======================
     @DeleteMapping("/{id}")
-    public void borrar(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> borrar(@PathVariable Long id) {
+
+        if (!repo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
         repo.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

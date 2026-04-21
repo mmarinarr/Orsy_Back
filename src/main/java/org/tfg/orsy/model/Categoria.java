@@ -1,5 +1,6 @@
 package org.tfg.orsy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -12,7 +13,8 @@ public class Categoria {
 
     private String nombre;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Producto> productos;
 
     // CONSTRUCTORES
