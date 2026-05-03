@@ -66,7 +66,7 @@ public class ComandaController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     public ResponseEntity<Comanda> getActiva(@PathVariable Long mesaId) {
 
-        return comandaRepo.findFirstByMesaIdAndEstado(mesaId, EstadoComanda.ABIERTA)
+        return comandaRepo.findFirstByMesaIdAndEstadoOrderByFechaDesc(mesaId, EstadoComanda.ABIERTA)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.ok(null));
     }
@@ -85,16 +85,37 @@ public class ComandaController {
         Comanda comanda = comandaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comanda no encontrada"));
 
+        if (dto.mesaId() != null) {
+            Mesa mesa = mesaRepo.findById(dto.mesaId())
+                    .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+            comanda.setMesa(mesa);
+        }
+
+        if (dto.lineas() != null) {
+            List<LineaComanda> lineas = new ArrayList<>();
+
+            for (LineaDTO l : dto.lineas()) {
+                Producto producto = productoRepo.findById(l.productoId())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+                LineaComanda linea = new LineaComanda();
+                linea.setProducto(producto);
+                linea.setNombre(producto.getNombre());
+                linea.setPrecio(producto.getPrecio());
+                linea.setCategoria(producto.getCategoria() != null ? producto.getCategoria().getNombre() : null);
+                linea.setCantidad(l.cantidad());
+                linea.setComanda(comanda);
+
+                lineas.add(linea);
+            }
+
+            comanda.setLineas(lineas);
+        }
+
         if (dto.estado() != null) {
             comanda.setEstado(dto.estado());
         }
 
         return ResponseEntity.ok(comandaRepo.save(comanda));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void borrar(@PathVariable Long id) {
-        comandaRepo.deleteById(id);
     }
 }

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface ComandaRepository extends JpaRepository<Comanda, Long> {
 
-    Optional<Comanda> findFirstByMesaIdAndEstado(Long mesaId, EstadoComanda estado);
+    Optional<Comanda> findFirstByMesaIdAndEstadoOrderByFechaDesc(Long mesaId, EstadoComanda estado);
 }
